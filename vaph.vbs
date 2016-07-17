@@ -26,7 +26,8 @@ WorkSheet.Cells.WrapText = True
 WorkSheet.Cells.AutoFilter
 Worksheet.Columns(1).NumberFormat = "0"
 Worksheet.Columns(2).ColumnWidth = 40
-Worksheet.Columns(2).ColumnWidth = 120
+Worksheet.Columns(2).Hidden = True
+Worksheet.Columns(15).ColumnWidth = 120
 Worksheet.Columns(4).NumberFormat = "0"
 WorkSheet.Rows.AutoFit
 
@@ -131,6 +132,7 @@ Sub Opleg(file)
 				For i = 2 to 15
     				WorkSheet.cells(currentRow, i).value = Fiche.Cells(cel.row, i)
 				Next
+				WorkSheet.cells(currentRow, 16).value = file
 			End If
 		End If
 	Next
