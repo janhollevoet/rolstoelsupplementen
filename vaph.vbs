@@ -1,6 +1,7 @@
 'On Error Resume Next
 Set fso = CreateObject("Scripting.FileSystemObject")
-Set Folder = fso.GetFolder(fso.GetAbsolutePathName("."))
+
+Set Folder = fso.GetFolder(fso.GetAbsolutePathName("./samples"))
 Set Files = Folder.Files
 Dim app
 Set app = createobject("Excel.Application")
@@ -10,7 +11,7 @@ currentRow = 1
 xlTop = -4160
 
 For Each File in Files
-	If Instr(fso.GetExtensionName(File), "xls") Then
+	If Instr(fso.GetExtensionName(File), "xls") and (Instr(File.name, "2014") or Instr(File.name, "2015") or Instr(File.name, "2016")) Then
 		Wscript.Echo File.name
 		Opleg fso.GetAbsolutePathName(File)
 		Wscript.Echo "Done"
@@ -26,8 +27,10 @@ WorkSheet.Cells.WrapText = True
 WorkSheet.Cells.AutoFilter
 Worksheet.Columns(1).NumberFormat = "0"
 Worksheet.Columns(2).ColumnWidth = 40
-Worksheet.Columns(2).Hidden = True
+Worksheet.Columns(5).Hidden = True
+Worksheet.Columns(6).Hidden = True
 Worksheet.Columns(15).ColumnWidth = 120
+Worksheet.Columns(16).ColumnWidth = 80
 Worksheet.Columns(4).NumberFormat = "0"
 WorkSheet.Rows.AutoFit
 
@@ -76,7 +79,9 @@ Sub Opleg(file)
 		row = row + 1
 	Next 
 	For i = 2 to 15
-    	WorkSheet.cells(1, i).value = Fiche.Cells(oplegcel.row, i)
+	    If i <> 3  and i <> 5 and i <> 6 Then
+        	WorkSheet.cells(1, i).value = Fiche.Cells(oplegcel.row, i)
+		End If
 	Next
 				
 	If productcel is Nothing Then
@@ -125,12 +130,25 @@ Sub Opleg(file)
 		If emptycells > 100 Then
 			Exit For
 		End If
+		If Instr(UCase(Fiche.Cells(cel.row, 1)), "TOTAAL") Then
+			Exit For
+		End If
 		If IsNumeric(cel.value) Then
-			If cel.value > 0 and cel.Interior.ColorIndex = 2 Then
+			If cel.value > 0 and Fiche.Cells(cel.row, voorstelcel.column) <> "" Then
 				currentRow = currentRow + 1
 				WorkSheet.cells(currentRow, 1).value = basisproduct
 				For i = 2 to 15
-    				WorkSheet.cells(currentRow, i).value = Fiche.Cells(cel.row, i)
+				    If i = 2 Then
+    				    If Fiche.Cells(cel.row, i) = "" Then
+					      WorkSheet.cells(currentRow, i).value = Fiche.Cells(cel.row, i-1)
+					    Else
+					      WorkSheet.cells(currentRow, i).value = Fiche.Cells(cel.row, i)
+						End If
+					End If
+					
+            	    If i <> 2 and i <> 3  and i <> 5 and i <> 6 Then
+         				WorkSheet.cells(currentRow, i).value = Fiche.Cells(cel.row, i)
+					End If
 				Next
 				WorkSheet.cells(currentRow, 16).value = file
 			End If
